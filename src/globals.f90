@@ -3,7 +3,9 @@
 !
 
 module globals
-
+   
+   use fabm_types
+   
    implicit none
    !integer, parameter :: rk = selected_real_kind(13) ! dp =  kind(0.d0) ! double precision
 

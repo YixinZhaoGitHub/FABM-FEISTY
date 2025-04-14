@@ -40,6 +40,14 @@ Module setup
 
 ! resource parameters    input from input file
    real(rk), allocatable:: K(:), rr(:)   ! Carrying capacity of resources and growth rate of resources
+   
+! predation preference coefficient
+   real(rk) :: thetaS
+   real(rk) :: thetaA
+   real(rk) :: thetaD
+!  real(rk),parameter ::   thetaS = 0.25_rk ! Medium fish pref for small zooplankton
+!  real(rk),parameter ::   thetaA = 0.5_rk  ! Large fish pref for medium forage fish
+!  real(rk),parameter ::   thetaD = 0.75_rk ! Pref of large demersal on pelagic prey
 
 !=======================================================================================================
 ! New from Karline Soetaert package   (Oct 2023 added)
@@ -116,7 +124,6 @@ Module setup
          real(rk) :: smzcsp, lgzcsp, smzcsp_dr, lgzcsp_dr
 
 
-
 contains
 ! ======================================
 !  Different Setups
@@ -129,13 +136,6 @@ contains
       real(rk), intent(in)::szprod,lzprod, bprodin, dfbot, depth, Ts, Tb ! bprodin: benthic productivity, dfbot: detrital flux reaching the sea floor
       real(rk) :: bprod                                                  ! only one of them works, keep the unused arguments negative e.g., bprodin = 100._rk, dfbot = -1._rk
       integer :: iGroup
-! predation preference coefficient
-      real(rk) :: thetaS
-      real(rk) :: thetaA
-      real(rk) :: thetaD
-!      real(rk),parameter ::   thetaS = 0.25_rk ! Medium fish pref for small zooplankton
-!      real(rk),parameter ::   thetaA = 0.5_rk  ! Large fish pref for medium forage fish
-!      real(rk),parameter ::   thetaD = 0.75_rk ! Pref of large demersal on pelagic prey
 
       !benthic productivity
       if (bprodin < 0._rk .and. dfbot<0._rk) then
@@ -151,7 +151,7 @@ contains
        end if
       end if
 
-      call read_namelist_setupbasic()
+      !call read_namelist_setupbasic()
       call parametersInit(3, 2 + 3 + 3, 4, szprod,lzprod, bprod) ! (fish groups, total fish stages 2stages+3stages+3stages, 4 resources, szprod,lzprod, bprod,none)
       call parametersAddGroup(2, 2.50e2_rk, 0.5_rk) ! fishSmall
       call parametersAddGroup(3, 1.25e5_rk, 2.5e2_rk) ! fishLarge
@@ -227,22 +227,22 @@ contains
 
     call set2vec
     Rtype=1
-
-contains
-   subroutine read_namelist_setupbasic()
-      integer :: file_unit, io_err
-
-      namelist /input_setupbasic/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
-                                  & beta, sigma, mMin, &
-                                  & mMedium, mLarge, &
-                                  & lbenk, szoog, lzoog, sbeng, lbeng, &
-                                  & thetaS, thetaA, thetaD
-
-      call open_inputfile(file_unit, io_err)
-      read (file_unit, nml=input_setupbasic, iostat=io_err)
-      call close_inputfile(file_unit, io_err)
-   end subroutine read_namelist_setupbasic
-
+    
+!contains
+!   subroutine read_namelist_setupbasic()
+!      integer :: file_unit, io_err
+!
+!      namelist /input_setupbasic/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
+!                                  & beta, sigma, mMin, &
+!                                  & mMedium, mLarge, &
+!                                  & lbenk, szoog, lzoog, sbeng, lbeng, &
+!                                  & thetaS, thetaA, thetaD
+!
+!      call open_inputfile(file_unit, io_err)
+!      read (file_unit, nml=input_setupbasic, iostat=io_err)
+!      call close_inputfile(file_unit, io_err)
+!   end subroutine read_namelist_setupbasic
+   
    end subroutine setupbasic
 
 ! --------------------------------------
@@ -257,11 +257,6 @@ contains
       integer, intent(in) :: nStages,bETin
       real(rk) :: bprod
       integer :: iGroup, i, j
-! predation preference coefficient
-      real(rk) :: thetaA
-      real(rk) :: thetaD
-!      real(rk),parameter ::   thetaA = 0.5_rk  ! Large fish pref for medium forage fish
-!      real(rk),parameter ::   thetaD = 0.75_rk ! Pref of large demersal on pelagic prey
 
       !benthic productivity
       if (bprodin < 0._rk .and. dfbot<0._rk) then
@@ -277,7 +272,7 @@ contains
        end if
       end if
 
-      call read_namelist_setupbasic2()    !
+      !call read_namelist_setupbasic2()    !
       call parametersInit(3, nint(0.66_rk*nStages) + nStages + nStages, 4, szprod,lzprod, bprod) ! (fish groups, total fish stages, 4 resources,szprod,lzprod, bprod,none)
       call parametersAddGroup(nint(0.66_rk*nStages), 2.50e2_rk, etaMature*2.50e2_rk) ! fishSmall  original mature mass is 0.002 *2.50e2_rk=0.5_rk
       call parametersAddGroup(nStages, 1.25e5_rk, etaMature*1.25e5_rk) ! fishLarge (stages, max mass, mature mass) 0.002 *1.25e5_rk=2.5e2_rk
@@ -417,20 +412,20 @@ contains
     call set2vec
     Rtype=1
 
-contains
-   subroutine read_namelist_setupbasic2()
-      integer :: file_unit, io_err
-
-      namelist /input_setupbasic2/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
-                                  & beta, sigma, mMin, &
-                                  & mMedium, mLarge, &
-                                  & lbenk, szoog, lzoog, sbeng, lbeng, &
-                                  & thetaA, thetaD
-
-      call open_inputfile(file_unit, io_err)
-      read (file_unit, nml=input_setupbasic2, iostat=io_err)
-      call close_inputfile(file_unit, io_err)
-   end subroutine read_namelist_setupbasic2
+!contains
+   !subroutine read_namelist_setupbasic2()
+   !   integer :: file_unit, io_err
+   !
+   !   namelist /input_setupbasic2/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
+   !                               & beta, sigma, mMin, &
+   !                               & mMedium, mLarge, &
+   !                               & lbenk, szoog, lzoog, sbeng, lbeng, &
+   !                               & thetaA, thetaD
+   !
+   !   call open_inputfile(file_unit, io_err)
+   !   read (file_unit, nml=input_setupbasic2, iostat=io_err)
+   !   call close_inputfile(file_unit, io_err)
+   !end subroutine read_namelist_setupbasic2
 
    end subroutine setupbasic2
 ! --------------------------------------
@@ -478,7 +473,7 @@ contains
       real(rk), parameter :: etaMature = 0.002_rk
       integer, parameter :: nStages = 6
 
-      call read_namelist_setupvertical()
+      !call read_namelist_setupvertical()
       allocate(xrange(int(bottom) + 1))
 
 ! calc bprod before initialization
@@ -839,20 +834,20 @@ contains
     call set2vec
     Rtype=1
 
-contains
-   subroutine read_namelist_setupvertical()
-      integer :: file_unit, io_err
-
-      namelist /input_setupvertical/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
-                                  & beta, sigma, mMin, &
-                                  & lbenk, szoog, lzoog, sbeng, lbeng,&!bent,
-                                  & mMedium, mLarge, &
-                                  & ssigma, tau, shelfdepth, visual
-
-      call open_inputfile(file_unit, io_err)
-      read (file_unit, nml=input_setupvertical, iostat=io_err)
-      call close_inputfile(file_unit, io_err)
-   end subroutine read_namelist_setupvertical
+!contains
+!   subroutine read_namelist_setupvertical()
+!      integer :: file_unit, io_err
+!
+!      namelist /input_setupvertical/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
+!                                  & beta, sigma, mMin, &
+!                                  & lbenk, szoog, lzoog, sbeng, lbeng,&!bent,
+!                                  & mMedium, mLarge, &
+!                                  & ssigma, tau, shelfdepth, visual
+!
+!      call open_inputfile(file_unit, io_err)
+!      read (file_unit, nml=input_setupvertical, iostat=io_err)
+!      call close_inputfile(file_unit, io_err)
+!   end subroutine read_namelist_setupvertical
 
    end subroutine setupVertical
 
@@ -906,7 +901,7 @@ contains
                   Tsmall, Tmedium, Tnightlarge, Tnightnonlarge
 
 
-      call read_namelist_setupvertical()
+      !call read_namelist_setupvertical()
       allocate(xrange(int(bottom) + 1))
 
 ! calc bprod before initialization
@@ -1374,20 +1369,20 @@ contains
     call set2vec
     Rtype=1
 
-contains
-   subroutine read_namelist_setupvertical()
-      integer :: file_unit, io_err
-
-      namelist /input_setupvertical2/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
-                                  & beta, sigma, mMin, &
-                                  & lbenk, szoog, lzoog, sbeng, lbeng,&!bent,
-                                  & mMedium, mLarge, &
-                                  & ssigma, tau!, mesop, visual
-
-      call open_inputfile(file_unit, io_err)
-      read (file_unit, nml=input_setupvertical2, iostat=io_err)
-      call close_inputfile(file_unit, io_err)
-   end subroutine read_namelist_setupvertical
+!contains
+!   subroutine read_namelist_setupvertical()
+!      integer :: file_unit, io_err
+!
+!      namelist /input_setupvertical2/ h, nn, q, gamma, kk, p, epsAssim, epsRepro, &
+!                                  & beta, sigma, mMin, &
+!                                  & lbenk, szoog, lzoog, sbeng, lbeng,&!bent,
+!                                  & mMedium, mLarge, &
+!                                  & ssigma, tau!, mesop, visual
+!
+!      call open_inputfile(file_unit, io_err)
+!      read (file_unit, nml=input_setupvertical2, iostat=io_err)
+!      call close_inputfile(file_unit, io_err)
+!   end subroutine read_namelist_setupvertical
 
    end subroutine setupVertical2
 
@@ -1904,7 +1899,7 @@ allocate (fTempmV(size(depthDay,2)))
     fTempV = 0._rk
     fTempmV  = 0._rk
 
-open(unit=1,action='read', file=file_path_V,status="old")!C:/Users/Admin/Desktop/FEISTY-main/FEISTY-main
+!open(unit=1,action='read', file=file_path_V,status="old")!C:/Users/Admin/Desktop/FEISTY-main/FEISTY-main
 do i = 1,5501
     read(1,*) tempdata(i,1),tempdata(i,2),tempdata(i,3),tempdata(i,4) !depth 0-5500(no use), tropical, temperate, boreal, default(10 celcius)
 end do

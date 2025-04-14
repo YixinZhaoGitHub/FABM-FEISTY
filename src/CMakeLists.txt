@@ -5,6 +5,7 @@ add_library(fabm_models_feisty OBJECT
             fish.F90
             spectrum.F90
             globals.F90
+            setupbasic.F90
            )
 
 #target_link_libraries(fabm_models_feisty PRIVATE fabm_base)
