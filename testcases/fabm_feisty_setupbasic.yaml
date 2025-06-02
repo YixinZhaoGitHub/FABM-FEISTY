@@ -1,5 +1,5 @@
 check_conservation: false
-require_initialization: true
+require_initialization: false
 instances:
 # 
   fish:

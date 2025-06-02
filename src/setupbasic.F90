@@ -7,18 +7,21 @@ module feisty_setupbasic
    use fish
    use setup
    use fabm_types
+   use fabm_particle
+   use fabm_builtin_depth_mapping   
    
    implicit none
 
    private
 
-   type, extends(type_base_model), public :: type_feisty_setupbasic
+   type, extends(type_depth_integrated_particle), public :: type_feisty_setupbasic
       ! Add variable identifiers and parameters here.
-      type (type_state_variable_id),         allocatable :: id_u(:)
+      type (type_surface_state_variable_id),         allocatable :: id_u(:)
       
       
    contains
       procedure :: initialize
+      !  procedure :: do_surface
       ! Reference model procedures here.
    end type type_feisty_setupbasic
 
