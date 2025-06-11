@@ -1,6 +1,6 @@
 add_library(fabm_models_feisty OBJECT
             feisty_model_library.F90
-	    input.F90
+	          input.F90
             FEISTY.F90
             setup.F90
             fish.F90
